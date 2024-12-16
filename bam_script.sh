@@ -1,15 +1,15 @@
 #!/bin/bash
 
-items=( "SRR24147148" "SRR24147147" "SRR24147146" "SRR24147145" "SRR24147144" "SRR24147143" "SRR24147142" "SRR24147141" "SRR24147140" "SRR24147139" "SRR24147138" "SRR24147137" "SRR24147136" "SRR24147135" "SRR24147134" "SRR24147133" "SRR24147132" "SRR24147131" "SRR24147130" "SRR24147129" "SRR24147128" )
+items=( SRR6914927 SRR6914928 SRR6914931 SRR6914932 SRR6914933 SRR6914934 SRR6914935 SRR6914937 SRR6914959 SRR6914960 SRR6914961 SRR6914962 SRR6914963 SRR6914964 SRR6914973 SRR6914974 )
 
 for item in "${items[@]}"; do
-  echo “Downloading FASTQ from SRA Archive”
+  echo "Downloading FASTQ from SRA Archive"
   cd fastq
-  prefetch “$item”
-  fasterq-dump --split-files “$item”
+  /ccb/sw/bin/prefetch --max-size 150G "$item"
+  /ccb/sw/bin/fasterq-dump --split-files "$item"
   cd ..
-  echo "Running $item with HISAT2"
-  hisat2 -p 8 --dta --quiet -x hisat_index/hisat_index -1 fastq/”$item”_1.fastq -2 fastq/“$item”_2.fastq -S sams/”$item”.sam
-  samtools sort -@ 8 -o bams/”$item”.bam sams/”$item”.sam
-  rm -rf fastq/”$item”_*
+  echo "Running $item with BowTie2"
+  bowtie2 -p 16 -x bt_index/index -1 fastq/"$item"_1.fastq -2 fastq/"$item"_2.fastq -S sams/"$item".sam
+  /ccb/sw/bin/samtools sort -@ 8 -o bams/"$item".bam sams/"$item".sam
+  rm -rf fastq/"$item"_*
 done
